@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo do Quadrado Espacial</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    canvas {
+      background-color: #1e1e2f;
+      border: 3px solid #00ffcc;
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 Pegue os Quadrados Verdes!</h1>
+  <p>Use as <b>setas do teclado</b> para mover o quadrado azul.</p>
+  <p>Pontuação: <span id="score">0</span></p>
+
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreElement = document.getElementById("score");
+
+    let score = 0;
+    let player = { x: 180, y: 180, size: 30, speed: 5 };
+    let target = { x: Math.random() * 370, y: Math.random() * 370, size: 20 };
+
+    let keys = {};
+
+    window.addEventListener("keydown", (e) => keys[e.key] = true);
+    window.addEventListener("keyup", (e) => keys[e.key] = false);
+
+    function update() {
+      if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
+      if (keys["ArrowDown"] && player.y < canvas.height - player.size) player.y += player.speed;
+      if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
+      if (keys["ArrowRight"] && player.x < canvas.width - player.size) player.x += player.speed;
+
+      // Colisão
+      if (
+        player.x < target.x + target.size &&
+        player.x + player.size > target.x &&
+        player.y < target.y + target.size &&
+        player.y + player.size > target.y
+      ) {
+        score++;
+        scoreElement.textContent = score;
+        target.x = Math.random() * (canvas.width - target.size);
+        target.y = Math.random() * (canvas.height - target.size);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Desenha o jogador
+      ctx.fillStyle = "#00aaff";
+      ctx.fillRect(player.x, player.y, player.size, player.size);
+
+      // Desenha o alvo
+      ctx.fillStyle = "#00ffcc";
+      ctx.fillRect(target.x, target.y, target.size, target.size);
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
